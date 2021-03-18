@@ -1,0 +1,1 @@
+sphinx-autobuild -B -z ../pangolin ./source ./build -i *~
