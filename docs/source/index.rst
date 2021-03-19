@@ -7,7 +7,7 @@
     :maxdepth: 2
     :caption: Contents:
 
-    reference/api
+    reference/jaw_type
 
 
 Indices and tables
