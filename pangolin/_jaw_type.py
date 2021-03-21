@@ -4,12 +4,22 @@
 
 from collections.abc import Mapping
 from typing import Union
-import attr
 
 
-@attr.attrs(slots=True, frozen=True)
 class BaseBucket(Mapping):
     """A custom bucket class which acts a bit like a dictionary."""
+
+    def __init__(self, **kwargs):
+        for (key, value) in kwargs.items():
+            setattr(self, "_" + key, value)
+
+    def __hash__(self):
+        return hash(tuple(getattr(self, i) for i in self.__slots__))
+
+    def __repr__(self):
+        arguments = ", ".join(
+            f"{key}={repr(value)}" for (key, value) in self.items())
+        return f"{type(self).__name__}({arguments})"
 
     def with_(self, **values):
         """Return a modified copy. Arguments can be any of the core attributes
@@ -18,7 +28,7 @@ class BaseBucket(Mapping):
         """
         out = self.to_dict()
         for (key, val) in values.items():
-            if val is not None:
+            if val is not ...:
                 out[key] = val
         return type(self)(**out)
 
@@ -75,16 +85,16 @@ class BaseBucket(Mapping):
     def __len__(self):
         return len(self.__slots__)
 
+    @classmethod
     def keys(self):
-        return self.__slots__
+        return [i[1:] for i in self.__slots__]
 
     @classmethod
     def from_obj(cls, obj):
         """Extract attributes from an object (usually of the same type)."""
-        return cls(**{key: getattr(obj, key) for key in cls.__slots__})
+        return cls(**{key: getattr(obj, key) for key in cls.keys()})
 
 
-@attr.attrs(slots=True, frozen=True, auto_attribs=True)
 class JawType(BaseBucket):
     """The :class:`JawType` bucket class contains the attributes:
 
@@ -93,27 +103,36 @@ class JawType(BaseBucket):
     - :attr:`species`
 
     """
+    __slots__ = ("_arch_type", "_primary", "_species")
 
-    arch_type: str = "*"
-    """Specifies upper or lower jaw:
+    def __init__(self, arch_type="*", primary=False, species="human"):
+        BaseBucket.__init__(**locals())
 
-    - For a maxillary (upper) jaw: :py:`'U'`,
-    - For a mandibular (lower) jaw: :py:`'L'`,
-    - For unspecified use :py:`'*'`.
+    @property
+    def arch_type(self) -> str:
+        """Specifies upper or lower jaw:
 
-    """
+        - For a maxillary (upper) jaw: :py:`'U'`,
+        - For a mandibular (lower) jaw: :py:`'L'`,
+        - For unspecified use :py:`'*'`.
 
-    primary: Union[bool, str] = False
-    """Specifies deciduous dentition (A.K.A baby teeth).
-    Either :py:`True` or :py:`False` or :py:`'*'`.
-    """
+        """
+        return self._arch_type
 
-    species: str = "human"
-    """Specifies the species. Defaults to, and will likely always be,
-    :py:`'human'`. It is highly recommended that you use '-' instead of spaces
-    to delimite multiple words.
-    """
+    @property
+    def primary(self) -> Union[bool, str]:
+        """Specifies deciduous dentition (A.K.A baby teeth).
+        Either :py:`True` or :py:`False` or :py:`'*'`.
+        """
+        return self._primary
 
-    def with_(self, arch_type=None, primary=None, species=None):
-        return super().with_(arch_type=arch_type, primary=primary,
-                             species=species)
+    @property
+    def species(self) -> str:
+        """Specifies the species. Defaults to, and will likely always be,
+        :py:`'human'`. It is highly recommended that you use '-' instead of spaces
+        to delimite multiple words.
+        """
+        return self._species
+
+    def with_(self, arch_type=..., primary=..., species=...):
+        return BaseBucket.with_(**locals())

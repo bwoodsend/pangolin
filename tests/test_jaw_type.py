@@ -23,7 +23,7 @@ def test_basics():
     assert self.to_dict(skip_wildcard=True) == \
            {"species": "human", "primary": False}
 
-    with pytest.raises(attr.exceptions.FrozenInstanceError):
+    with pytest.raises(AttributeError):
         self.species = "something else"
 
     assert JawType(species="cat").species == "cat"

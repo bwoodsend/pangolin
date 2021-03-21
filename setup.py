@@ -25,7 +25,7 @@ setup(
         'Programming Language :: Python :: 3.9',
     ],
     description="Tools for writing and parsing Dental Palmer notation.",
-    install_requires=['attrs'],
+    install_requires=[],
     extras_require={
         "test": [
             'pytest>=3', 'pytest-order', 'coverage', 'pytest-cov',
