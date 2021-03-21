@@ -8,6 +8,7 @@
     :caption: Contents:
 
     reference/jaw_type
+    reference/misc
 
 
 Indices and tables
