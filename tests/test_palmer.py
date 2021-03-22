@@ -59,3 +59,19 @@ def test_parse_str(species, index, sub_index, primary, side, arch_type):
 def test_negative():
     assert -Palmer("UR3") == "UL3"
     assert -Palmer("*L*") == "*R*"
+
+
+def test_kinds():
+    assert Palmer("LR2").kind == "I"
+    assert Palmer("UL5").kind == "P"
+    assert Palmer("ULE").kind == "M"
+    assert Palmer("**1").kind == "I"
+
+    with pytest.raises(ValueError,
+                       match=r"Can't determine .* 'UR\*'\. Don't .*"):
+        Palmer("UR*").kind
+
+    assert Palmer("sheep-LL10").kind == "M"
+
+    with pytest.raises(ValueError):
+        assert Palmer("sheep-*L10").kind

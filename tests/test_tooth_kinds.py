@@ -26,3 +26,6 @@ def test():
     # `primary` should not be a wildcard because it's ambiguous.
     with pytest.raises(ValueError):
         tooth_kinds(JawType(primary="*"))
+
+    # Haha, I'm hilarious.
+    assert tooth_kinds(JawType(species="pangolin")) == ''

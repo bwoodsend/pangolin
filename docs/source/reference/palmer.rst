@@ -15,6 +15,8 @@
     .. autoattribute:: primary
     .. autoattribute:: species
 
+    .. autoattribute:: kind
+    .. autoattribute:: KINDS
     .. autoattribute:: jaw_type
     .. automethod:: match
 

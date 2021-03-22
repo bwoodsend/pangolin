@@ -6,6 +6,7 @@ import re
 from typing import Union
 
 from pangolin._jaw_type import JawType, BaseBucket
+from pangolin import tooth_kinds
 
 
 _palmer_regex = re.compile(r"""
@@ -154,6 +155,26 @@ class Palmer(JawType):
         """Export the :class:`JawType` properties of the arch that this tooth
         belongs to."""
         return JawType.from_obj(self)
+
+    @property
+    def kind(self):
+        """Returns the tooth's sub-type as one the typical dental abbreviations
+        listed below:
+
+        - :py:`'I'`: Incisor
+        - :py:`'C'`: Canine
+        - :py:`'P'`: Premolar
+        - :py:`'M'`: Molar
+
+        This table is stored in :attr:`Palmer.KINDS`.
+
+        """
+        if self.index == "*":
+            raise ValueError(f"Can't determine tooth kind of '{self}'. Don't "
+                             f"know which tooth it is!")
+        return tooth_kinds(self.jaw_type)[self.index - 1]
+
+    KINDS = dict(zip("ICPM", ("incisor", "canine", "premolar", "molar")))
 
     def with_(self, arch_type=..., side=..., index=..., sub_index=...,
               primary=..., species=...):
