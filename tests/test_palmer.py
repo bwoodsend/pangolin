@@ -75,3 +75,38 @@ def test_kinds():
 
     with pytest.raises(ValueError):
         assert Palmer("sheep-*L10").kind
+
+
+def test_range():
+    # Basic.
+    assert Palmer.range("UR2", "UR4") == ["UR2", "UR3", "UR4"]
+
+    # Use 0 to mean center.
+    assert Palmer.range(0, "LRC") == ["LRA", "LRB", "LRC"]
+    assert Palmer.range("*L2", 0) == ["*L2", "*L1"]
+
+    # Conflicting jaw types. Priorities are kwargs > start > end.
+    assert Palmer.range("ULE", "LL3", arch_type="L") == ["LLE", "LLD", "LLC"]
+    # Under-defined jaw type. Use defaults which aren't overridden by kwargs.
+    assert Palmer.range(0, primary=True) == Palmer.range(0, "*RE")
+
+    # Cross the middle. Should be no LL0 or LR0.
+    assert Palmer.range("*L2", "LRB") == ["*L2", "*L1", "*R1", "*R2"]
+
+    # Default to extremes if either start or end is undefined.
+    assert Palmer.range("URC") == ["URC", "URD", "URE"]
+
+    # Unknown jaw types should still work.
+    assert Palmer.range("monster-LL2", 0) == ["monster-LL2", "monster-LL1"]
+    # Unless the number of teeth is needed.
+    with pytest.raises(ValueError, match="No tooth kinds"):
+        Palmer.range("monster-LL2")
+
+    # Going backwards silently returns an empty list.
+    assert Palmer.range("LR2", "*L2") == []
+
+    # Wildcards in the wrong places.
+    with pytest.raises(ValueError, match=r" '\*\*3' is ambiguous"):
+        Palmer.range("**3")
+    with pytest.raises(ValueError):
+        Palmer.range("UL*")

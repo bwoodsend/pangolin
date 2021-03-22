@@ -3,7 +3,7 @@
 """
 
 import re
-from typing import Union
+from typing import Union, List
 
 from pangolin._jaw_type import JawType, BaseBucket
 from pangolin import tooth_kinds
@@ -176,6 +176,70 @@ class Palmer(JawType):
 
     KINDS = dict(zip("ICPM", ("incisor", "canine", "premolar", "molar")))
 
+    @classmethod
+    def range(cls, start: PalmerLike = None, end: PalmerLike = None,
+              **jaw_type) -> List['Palmer']:
+        """Generate a range of consecutive Palmers.
+
+        Args:
+            start:
+                Left-most tooth to include.
+            end:
+                Right-most tooth to include.
+            jaw_type:
+                Overide the jaw type of the output.
+                Defaults to mirroring :attr:`start.jaw_type <Palmer.jaw_type>`.
+        Returns:
+            Consecutive tooth types ordered from left to right.
+
+        ::
+
+            >>> Palmer.range("LL2", "LR3")
+            [Palmer('LL2'), Palmer('LL1'), Palmer('LR1'), Palmer('LR2'), Palmer('LR3')]
+
+        If either **start** or **end** are unspecified then they default to the
+        left-most and right-most possible tooth types
+
+        .. code-block:: python
+
+            >>> Palmer.range(primary=True, arch_type="U")
+            [Palmer('ULE'), Palmer('ULD'), Palmer('ULC'), Palmer('ULB'), Palmer('ULA'), Palmer('URA'), Palmer('URB'), Palmer('URC'), Palmer('URD'), Palmer('URE')]
+
+        """
+        _jaw_type = jaw_type
+        for x in (start, end):
+            if isinstance(x, (str, re.Match)):
+                x = cls(x)
+            if isinstance(x, cls):
+                _jaw_type = dict(x.jaw_type)
+                break
+
+        _jaw_type.update(jaw_type)
+        jaw_type = JawType(**_jaw_type)
+
+        if start is None or end is None:
+            max_index = len(tooth_kinds(jaw_type))
+        else:
+            # This value never gets used.
+            max_index = 0
+
+        start = _normalise_range_bound(start, -max_index)
+        end = _normalise_range_bound(end, max_index)
+
+        return cls._range(start, end, jaw_type)
+
+    @classmethod
+    def _range(cls, start: int, end: int, jaw_type: JawType):
+        """Create a range from *signed* indices. Negative sign means left."""
+        end += 1
+        out = []
+        base = cls(**jaw_type)
+        for index in range(start, min(0, end)):
+            out.append(base.with_(side="L", index=-index))
+        for index in range(max(start, 1), end):
+            out.append(base.with_(side="R", index=index))
+        return out
+
     def with_(self, arch_type=..., side=..., index=..., sub_index=...,
               primary=..., species=...):
         return BaseBucket.with_(**locals())
@@ -210,3 +274,14 @@ def char_to_digit(char):
 
 def digit_to_char(index):
     return chr(int(index) - 1 + ord("A"))
+
+
+def _normalise_range_bound(x, default):
+    if x is None:
+        return default
+    if isinstance(x, int) and x == 0:
+        return x
+    x = Palmer(x)
+    if x.side == "*" or x.index == "*":
+        raise ValueError(f"The side and/or index of '{x}' is ambiguous.")
+    return x.index * (-1 if x.side == "L" else 1)
