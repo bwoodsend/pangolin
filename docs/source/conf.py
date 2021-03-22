@@ -101,6 +101,7 @@ autodoc_default_options = {
 }
 autodoc_member_order = 'groupwise'
 typehints_document_rtype = False
+autodoc_preserve_defaults = True
 
 # -- Options for HTML output -------------------------------------------
 
