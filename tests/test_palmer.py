@@ -110,3 +110,17 @@ def test_range():
         Palmer.range("**3")
     with pytest.raises(ValueError):
         Palmer.range("UL*")
+
+
+def test_hash():
+    """Ensure that ``palmer`` and ``str(palmer)`` are
+    considered equivalent when used as dict keys or in sets.
+    """
+    palmers = Palmer.range()
+
+    set_ = set(palmers)
+    assert len(set_) == len(palmers)
+
+    for i in palmers:
+        assert i in set_
+        assert str(i) in set_

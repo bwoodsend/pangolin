@@ -124,6 +124,10 @@ class Palmer(JawType):
     def __eq__(self, x):
         return (self is x) or str(self) == x
 
+    def __hash__(self):
+        # Defining hash like this allows `{Palmer("LR2"): value}["LR2"]`.
+        return hash(str(self))
+
     def __neg__(self):
         return self.with_(side={"L": "R", "R": "L", "*": "*"}[self.side])
 
