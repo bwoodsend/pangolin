@@ -48,3 +48,17 @@ def test_jaw_type_match():
     assert JawType.match(dict(arch_type="*"), dict(arch_type="L"))
     assert not JawType(primary=False).match(JawType("U", "*"), strict=True)
     assert not JawType("L", True).match(JawType("*", False, "*"))
+
+
+def test_awkward_inputs():
+    self = JawType("L", True, "troll")
+    assert JawType(self) == self
+    assert JawType(**self) == self
+    assert JawType(dict(self)) == self
+
+    with pytest.raises(ValueError):
+        JawType("z")
+    with pytest.raises(ValueError):
+        JawType(10)
+    with pytest.raises(ValueError):
+        self.with_(arch_type=10)

@@ -106,7 +106,13 @@ class JawType(BaseBucket):
     __slots__ = ("_arch_type", "_primary", "_species")
 
     def __init__(self, arch_type="*", primary=False, species="human"):
-        BaseBucket.__init__(**locals())
+        if isinstance(arch_type, Mapping):
+            BaseBucket.__init__(self, **arch_type)
+        elif isinstance(arch_type, str) and arch_type in "LU*":
+            BaseBucket.__init__(**locals())
+        else:
+            raise ValueError(f"Invalid arch_type {repr(arch_type)}. "
+                             f"Must be one of 'LU*'.")
 
     @property
     def arch_type(self) -> str:
