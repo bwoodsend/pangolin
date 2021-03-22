@@ -97,8 +97,6 @@ intersphinx_mapping = {
 
 # Autodoc defaults.
 autodoc_default_options = {
-    'members': True,
-    'special-members': '__init__',
     'undoc-members': True,
 }
 autodoc_member_order = 'groupwise'
