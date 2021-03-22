@@ -38,3 +38,6 @@ def tooth_kinds(jaw_type=JawType()) -> str:
             return TOOTH_KINDS[jaw_type_]
     raise ValueError(f"No tooth kinds data is available for {repr(jaw_type)}. "
                      "You can add it to `pangolin.TOOTH_KINDS`.")
+
+
+from ._palmer import Palmer

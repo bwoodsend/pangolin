@@ -7,6 +7,7 @@
     :maxdepth: 2
     :caption: Contents:
 
+    reference/palmer
     reference/jaw_type
     reference/misc
 
