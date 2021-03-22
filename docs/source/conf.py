@@ -100,6 +100,7 @@ autodoc_default_options = {
     'undoc-members': True,
 }
 autodoc_member_order = 'groupwise'
+typehints_document_rtype = False
 
 # -- Options for HTML output -------------------------------------------
 
