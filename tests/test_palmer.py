@@ -3,7 +3,7 @@
 """
 
 import pytest
-from pangolin import Palmer
+from pangolin import Palmer, JawType
 
 pytestmark = pytest.mark.order(3)
 
@@ -32,6 +32,8 @@ def test_init():
                        match=r"Could not parse the palmer 'An UR3\.'\."):
         Palmer("An UR3.")
     assert Palmer(Palmer.regex.search("An UR3.")) == self
+
+    assert Palmer("orc-LLC").jaw_type == JawType("L", True, "orc")
 
 
 @pytest.mark.parametrize("species", ["human", "sausage-monster"])

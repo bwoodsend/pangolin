@@ -15,6 +15,7 @@
     .. autoattribute:: primary
     .. autoattribute:: species
 
+    .. autoattribute:: jaw_type
     .. automethod:: match
 
     .. autoattribute:: pangolin.Palmer.regex

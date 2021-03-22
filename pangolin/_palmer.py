@@ -149,6 +149,12 @@ class Palmer(JawType):
 
         return species + self.arch_type + self.side + index + sub_index
 
+    @property
+    def jaw_type(self) -> JawType:
+        """Export the :class:`JawType` properties of the arch that this tooth
+        belongs to."""
+        return JawType.from_obj(self)
+
     def with_(self, arch_type=..., side=..., index=..., sub_index=...,
               primary=..., species=...):
         return BaseBucket.with_(**locals())
