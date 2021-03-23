@@ -110,3 +110,15 @@ def test_symbolic(primary):
         Palmer("*R2").to_symbol()
     with pytest.raises(ValueError):
         Palmer("LL3.0").to_symbol()
+
+
+def test_numpy():
+    """numpy.array(Palmer()) must create a single-item object array - not unpack
+    the palmer as it would a tuple."""
+    np = pytest.importorskip("numpy")
+    self = Palmer()
+    arr = np.array(self)
+    assert arr.shape == ()
+    assert arr.dtype == object
+    assert arr.item() == self
+    assert np.array(Palmer.range()).shape == (16,)

@@ -28,3 +28,4 @@ rules =
   "platform_system != 'Linux'": Linux
   "sys_platform != 'msys'": msys
   "platform_system != 'FreeBSD'": FreeBSD
+  "not is_installed('numpy')": needs-numpy
