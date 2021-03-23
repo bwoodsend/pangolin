@@ -124,15 +124,41 @@ class Palmer(JawType):
     def __eq__(self, x):
         return (self is x) or str(self) == x
 
+    def __gt__(self, x):
+        if isinstance(x, (str, re.Match)):
+            x = Palmer(x)
+        return self._sort_key() > x
+
     def __hash__(self):
         # Defining hash like this allows `{Palmer("LR2"): value}["LR2"]`.
         return hash(str(self))
+
+    def __lt__(self, x):
+        if isinstance(x, (str, re.Match)):
+            x = Palmer(x)
+        return self._sort_key() < x
 
     def __neg__(self):
         return self.with_(side={"L": "R", "R": "L", "*": "*"}[self.side])
 
     def __repr__(self):
         return "{}('{}')".format(self.__class__.__name__, str(self))
+
+    def _sort_key(self):
+        """Convert to a number which may be used for sorting."""
+        out = self.index
+        if out == "*":
+            # Not really sure if there is a right answer for a wildcard index.
+            # This puts it in the middle: UL1 < UL* < UR* < UR1
+            out = 0.01
+        if self.sub_index is not None:
+            # Sub-enumerates are always considered more distal (further from the
+            # center): UL1.1 < UL1.0 < UL1 < UR1 < UR1.0 < UR1.1
+            out += (self.sub_index + 1) * 0.001
+        if self.side == "L":
+            # Mirror if left. Treat `side == "*"` as `side == "R"`.
+            return -out
+        return out
 
     def __str__(self):
         if self.species == "human":

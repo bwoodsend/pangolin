@@ -124,3 +124,19 @@ def test_hash():
     for i in palmers:
         assert i in set_
         assert str(i) in set_
+
+
+def test_sort():
+    assert Palmer("UR2") < Palmer("UR3")
+    assert "UR2" < Palmer("UR3")
+    assert Palmer("UR2") < "UR3"
+    assert Palmer("LL3") < "LL2"
+    assert Palmer("LL3.0") < "LL3"
+    assert Palmer("LL3.1") < "LL3.0"
+    assert Palmer("LL4") < "LL3.9"
+    assert Palmer("LR*") < "LR1"
+    assert Palmer("LL*") < "LR*"
+    assert Palmer("LR*") < "LR*.0"
+
+    palmers = Palmer.range(primary=True)
+    assert sorted(palmers[::-1]) == palmers
