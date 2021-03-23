@@ -46,4 +46,8 @@
             >>> Palmer.regex.sub(lambda m: str(Palmer(m).with_(primary=True)), text)
             'The LLE is more distal than the LLC.'
 
+    .. autoattribute:: quadrant
+    .. automethod:: to_FDI
+    .. automethod:: to_symbol
+    .. automethod:: to_universal
     .. automethod:: with_

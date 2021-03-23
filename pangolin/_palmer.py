@@ -141,6 +141,18 @@ class Palmer(JawType):
     def __neg__(self):
         return self.with_(side={"L": "R", "R": "L", "*": "*"}[self.side])
 
+    def _pre_conversion_check(self, type_name, wildcards=False, sub_index=False,
+                              human_only=False):
+
+        ext = " can't be converted to {}.".format(type_name)
+
+        if wildcards and (self.side == "*" or self.arch_type == "*"):
+            raise ValueError(f"Palmer '{self}' containing wildcards" + ext)
+        if sub_index and self.sub_index is not None:
+            raise ValueError(f"Palmer '{self}' containing sub_indices" + ext)
+        if human_only and (self.species != "human"):
+            raise ValueError(f"Non-human palmer '{self}'" + ext)
+
     def __repr__(self):
         return "{}('{}')".format(self.__class__.__name__, str(self))
 
@@ -206,6 +218,27 @@ class Palmer(JawType):
 
     KINDS = dict(zip("ICPM", ("incisor", "canine", "premolar", "molar")))
 
+    @property
+    def quadrant(self) -> str:
+        """Quadrant is a standard dental enumeration derived from :attr:`side`
+        and :attr:`arch_type`.
+
+        ========  =============  ============
+        ``side``  ``arch_type``  ``quadrant``
+        ========  =============  ============
+        ``'R'``   ``'U'``        1
+        ``'L'``   ``'U'``        2
+        ``'L'``   ``'L'``        3
+        ``'R'``   ``'L'``        4
+        ========  =============  ============
+
+        """
+        self._pre_conversion_check("quadrant", wildcards=True)
+        if self.arch_type == "U":
+            return 2 if self.side == "L" else 1
+        else:
+            return 3 if self.side == "L" else 4
+
     @classmethod
     def range(cls, start: PalmerLike = None, end: PalmerLike = None,
               **jaw_type) -> List['Palmer']:
@@ -268,6 +301,101 @@ class Palmer(JawType):
             out.append(base.with_(side="L", index=-index))
         for index in range(max(start, 1), end):
             out.append(base.with_(side="R", index=index))
+        return out
+
+    def to_FDI(self) -> str:
+        """Convert to `FDI International Standard
+        <https://support.clearcorrect.com/hc/article_attachments/360054874894/Dental_Notation_Systems_1_-_EN.jpg>`_.
+
+        """
+        self._pre_conversion_check("FDI Index", sub_index=True, human_only=True)
+        quadrant = self.quadrant
+
+        if self.primary:
+            quadrant += 4
+        return str(quadrant) + str(self.index)
+
+    def to_symbol(self, true_type: bool = False) -> str:
+        """Convert to special Palmer unicode symbols which match the traditional
+        handwritten syntax.
+
+        Args:
+            true_type:
+                Use true dedicated Palmer glyphs from the special Palmer font.
+                Otherwise just draw a corner and the index using more standard
+                unicode characters.
+        Returns:
+            The symbol(s) as a string.
+
+        True Palmer symbols exist only in special dedicated font libraries.
+
+            Daniel Johnson has put together a Palmer Tooth Notation TrueType
+            font called FreePalmer. It can be downloaded from
+            `FreePalmer TrueType Font <http://www.markpreston.co.uk/fonts/FreePalmer.ttf>`_.
+            It is covered by the GPL 3 license. This font is descended from
+            FreeSans, part of the `Freefont project <https://www.gnu.org/software/freefont/>`_.
+
+            --- This excerpt was nicked from
+                `Wikipedia <https://en.Wikipedia.org/wiki/Palmer_notation>`_
+
+        .. warning::
+
+            Please don't waste too much time on the font - it's not worth it.
+
+        """
+        self._pre_conversion_check("formatted palmer", wildcards=True,
+                                   sub_index=True)
+        #TODO: There is existing notation for 'unspecified' (wildcard) components.
+        #      These could be supported in the future.
+        if true_type:
+            return chr(0xE036 + (self.index - 1) + 8 * self.primary + 14 *
+                       (2 * (self.arch_type == "L") + (self.side == "L")))
+
+        quadrant = "⏌⎿⎾⏋"[self.quadrant - 1]
+
+        if self.primary:
+            index = digit_to_char(self.index)
+        else:
+            index = str(self.index)
+
+        if self.side == "L":
+            return quadrant + index
+        else:
+            return index + quadrant
+
+    def to_universal(self) -> str:
+        """Convert to `Universal ADA Standard
+        <https://support.clearcorrect.com/hc/article_attachments/360054874894/Dental_Notation_Systems_1_-_EN.jpg>`_.
+        For consistency when dealing with primary or supernumerary teeth, the
+        returned value is always a string.
+        """
+
+        self._pre_conversion_check("Universal System", human_only=True,
+                                   wildcards=True, sub_index=True)
+
+        # Which muppet thought this was a sensible form of notation???
+        # See the link in the class docstring for what this is all about.
+
+        if self.primary:
+            max_ = 20
+        else:
+            max_ = 32
+
+        out = self.index
+
+        if self.side == "R":
+            out = (1 + max_ // 4) - out
+        else:
+            out = max_ // 4 + out
+
+        if self.arch_type == "L":
+            out = (max_ + 1) - out
+
+        if self.primary:
+            out = digit_to_char(out)
+        else:
+            out = str(out)
+
         return out
 
     def with_(self, arch_type=..., side=..., index=..., sub_index=...,
