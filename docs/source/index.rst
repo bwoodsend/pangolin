@@ -10,6 +10,7 @@
     reference/palmer
     reference/jaw_type
     reference/misc
+    reference/arch_types.rst
 
 
 Indices and tables
