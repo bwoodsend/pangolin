@@ -56,12 +56,13 @@ class ParseArchType(object):
 
     @property
     def matched(self):
-        return self.input[self.best_matches[0].a:
-                          self.best_matches[-1].a + self.best_matches[-1].size]
+        start = self.best_matches[0].a
+        end = self.best_matches[-1].a + self.best_matches[-1].size
+        return self.input[start:end]
 
     @staticmethod
     def score(matches):
-        return sum(match.size ** 2 for match in matches)
+        return sum(match.size**2 for match in matches)
 
     def show(self):
         bits = []
@@ -103,8 +104,8 @@ def highlight_matches(x, a_or_b, *matches):
     for match in matches:
         start = getattr(match, a_or_b)
         bits += [
-            x[end: start],
-            underscore(x[start: start + match.size]),
+            x[end:start],
+            underscore(x[start:start + match.size]),
         ]
         end = start + match.size
     bits.append(x[end:])
