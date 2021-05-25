@@ -3,7 +3,7 @@
 """
 
 import re
-from typing import Union, List
+from typing import Union, List, Match
 
 from pangolin._jaw_type import JawType, BaseBucket
 from pangolin import tooth_kinds
@@ -28,7 +28,7 @@ _palmer_regex = re.compile(r"""
 
 """, re.VERBOSE)  # yapf: disable
 
-PalmerLike = Union['Palmer', str, re.Match]
+PalmerLike = Union['Palmer', str, Match]
 
 
 class Palmer(JawType):
@@ -100,7 +100,7 @@ class Palmer(JawType):
             Palmer('UR3')
 
         """
-        if isinstance(arch_type, re.Match):
+        if isinstance(arch_type, Match):
             # Form 3: from regex match. Unpack it then initialise explicitly.
             self.__init__(*unpack_match(arch_type))
 
@@ -125,7 +125,7 @@ class Palmer(JawType):
         return (self is x) or str(self) == x
 
     def __gt__(self, x):
-        if isinstance(x, (str, re.Match)):
+        if isinstance(x, (str, Match)):
             x = Palmer(x)
         return self._sort_key() > x
 
@@ -134,7 +134,7 @@ class Palmer(JawType):
         return hash(str(self))
 
     def __lt__(self, x):
-        if isinstance(x, (str, re.Match)):
+        if isinstance(x, (str, Match)):
             x = Palmer(x)
         return self._sort_key() < x
 
@@ -271,7 +271,7 @@ class Palmer(JawType):
         """
         _jaw_type = jaw_type
         for x in (start, end):
-            if isinstance(x, (str, re.Match)):
+            if isinstance(x, (str, Match)):
                 x = cls(x)
             if isinstance(x, cls):
                 _jaw_type = dict(x.jaw_type)
@@ -403,7 +403,7 @@ class Palmer(JawType):
         return BaseBucket.with_(**locals())
 
 
-def unpack_match(match: re.Match) -> tuple:
+def unpack_match(match: Match) -> tuple:
     """Convert a match from :attr:`Palmer.regex` into explicit palmer arguments.
     """
 
