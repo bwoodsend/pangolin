@@ -1,1 +1,1 @@
-sphinx-autobuild -B -z ../pangolin ./source ./build -i *~
+sphinx-autobuild --open-browser --watch ../pangolin ./source ./build --ignore "*~"

@@ -1,11 +1,15 @@
-.. automodule:: pangolin
-    :no-members:
+.. module:: pangolin
 
 .. include:: ../../README.rst
+    :end-before: Quickstart
+
 
 .. toctree::
-    :maxdepth: 2
-    :caption: Contents:
+    :caption: Usage
+
+
+.. toctree::
+    :caption: API Reference
 
     reference/palmer
     reference/jaw_type
@@ -13,8 +17,8 @@
     reference/arch_types.rst
 
 
-Indices and tables
-==================
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. toctree::
+    :caption: About
+
+    history
+

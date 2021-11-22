@@ -19,6 +19,8 @@
 #
 import os
 import sys
+from pathlib import Path
+from textwrap import indent
 
 sys.path.insert(0, os.path.abspath('../..'))
 
@@ -40,6 +42,7 @@ extensions = [
     'sphinx.ext.autosectionlabel',
     'sphinx.ext.intersphinx',
     'sphinx_autodoc_typehints',
+    'sphinx_rtd_theme_configuration',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -103,6 +106,33 @@ autodoc_member_order = 'groupwise'
 typehints_document_rtype = False
 autodoc_preserve_defaults = True
 
+# Make `foo` equivalent to :any:`foo`.
+default_role = "any"
+
+# Build the changelog from per-release fragments.
+histories = sorted(
+    Path("../../history").resolve().glob("*.rst"),
+    key=lambda x: tuple(map(int, x.stem.split("."))), reverse=True)
+
+history = """\
+=========
+Changelog
+=========
+
+.. role:: red
+    :class: in-red
+
+Release history for `pangolin`.
+Breaking changes are :red:`highlighted in red`.
+
+""" + "\n".join(f"v{i.stem}\n-{'-' * len(i.stem)}\n\n"
+                f".. rst-class:: spacious\n\n"
+                f"{indent(i.read_text(), '    ')}" for i in histories)
+
+history_path = Path("history.rst")
+if (not history_path.exists()) or history_path.read_text() != history:
+    history_path.write_text(history)
+
 # -- Options for HTML output -------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -120,55 +150,3 @@ html_static_path = ['static']
 
 def setup(app):
     app.add_css_file('theme-overrides.css')
-
-
-#html_favicon = 'favicon.png'
-
-# -- Options for HTMLHelp output ---------------------------------------
-
-# Output file base name for HTML help builder.
-htmlhelp_basename = 'pangolindoc'
-
-# -- Options for LaTeX output ------------------------------------------
-
-latex_elements = {
-    # The paper size ('letterpaper' or 'a4paper').
-    #
-    # 'papersize': 'letterpaper',
-
-    # The font size ('10pt', '11pt' or '12pt').
-    #
-    # 'pointsize': '10pt',
-
-    # Additional stuff for the LaTeX preamble.
-    #
-    # 'preamble': '',
-
-    # Latex figure (float) alignment
-    #
-    # 'figure_align': 'htbp',
-}
-
-# Grouping the document tree into LaTeX files. List of tuples
-# (source start file, target name, title, author, documentclass
-# [howto, manual, or own class]).
-latex_documents = [
-    (master_doc, 'pangolin.tex', 'pangolin Documentation', 'Brénainn Woodsend',
-     'manual'),
-]
-
-# -- Options for manual page output ------------------------------------
-
-# One entry per manual page. List of tuples
-# (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, 'pangolin', 'pangolin Documentation', [author], 1)]
-
-# -- Options for Texinfo output ----------------------------------------
-
-# Grouping the document tree into Texinfo files. List of tuples
-# (source start file, target name, title, author,
-#  dir menu entry, description, category)
-texinfo_documents = [
-    (master_doc, 'pangolin', 'pangolin Documentation', author, 'pangolin',
-     'One line description of project.', 'Miscellaneous'),
-]

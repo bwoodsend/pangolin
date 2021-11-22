@@ -1,29 +1,26 @@
-========
-pangolin
-========
-
-..
-    This site auto-generates the little python version badges from url.
-    The required  format is:
-    https://img.shields.io/badge/[text_block_1]-[text_block_2]-[html_named_color].svg
-
-    It helps to pad with spaces. Characters need to be url escaped (can be done
-    using urllib).
-
-    from urllib.parse import quote
-    "https://img.shields.io/badge/" + quote("python- {}-blue.svg".format(\
-                " | ".join(["3.6", "3.7", "3.8", "3.9", "PyInstaller"])))
+====================
+Welcome to pangolin!
+====================
 
 .. image::
-    https://img.shields.io/badge/
-    Python-%203.6%20%7C%203.7%20%7C%203.8%20%7C%203.9%20%7C%20PyInstaller-blue.svg
+    https://img.shields.io/pypi/pyversions/pangolin?label=Python
+    :alt: PyPI version
+    :target: https://pypi.org/project/pangolin/
 
-Tools for parsing and writing Dental Palmer notation.
+Tools for writing and parsing Dental Palmer notation.
 
-
-* Free software: MIT license
-* Documentation: https://pangolin.readthedocs.io.
-
+∘
+`MIT license <https://github.com/bwoodsend/pangolin/blob/master/LICENSE>`_
+∘
+PyPI_
+∘
+`Documentation <https://pangolin.readthedocs.io/>`_
+∘
+`Source code <https://github.com/bwoodsend/pangolin>`_
+∘
+`Bug reports <https://github.com/bwoodsend/pangolin/issues>`_
+∘
+`Support <https://github.com/bwoodsend/pangolin/discussions>`_
 
 
 Installation
