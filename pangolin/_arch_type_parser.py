@@ -5,12 +5,14 @@
 import difflib
 import re
 from typing import List
+from collections import namedtuple
 
 
-def matching_blocks(s1, s2):
-    matcher = difflib.SequenceMatcher(None, s1, s2)
-    matches = [m for m in matcher.get_matching_blocks() if m.size]
-    return matches
+class Span(namedtuple("Span", ["start", "size"])):
+
+    @property
+    def end(self):
+        return self.start + self.size
 
 
 class ParseArchType(object):
@@ -28,7 +30,6 @@ class ParseArchType(object):
     ]
 
     input: str
-    matches: List[List[difflib.Match]]
     specifier: str
     arch_type: str
     best_matches: List[difflib.Match]
@@ -36,43 +37,62 @@ class ParseArchType(object):
     def __init__(self, input):
         self.input = str(input)
         self._input = self.input.lower()
+        self._match()
 
-        self.matches = [
-            matching_blocks(self._input, i[0]) for i in self.SPECIFIERS
+    @staticmethod
+    def _match_specifier_word(word_match, specifier):
+        matcher = difflib.SequenceMatcher(None, word_match.group(), specifier)
+        spans = [
+            Span(i.a + word_match.start(), i.size)
+            for i in matcher.get_matching_blocks()
         ]
+        return spans
 
-        self._index = max(range(len(self.SPECIFIERS)),
-                          key=lambda x: self.score(self.matches[x]))
-        self.specifier, self.arch_type = self.SPECIFIERS[self._index]
-        self.best_matches = self.matches[self._index]
+    def _match_specifier(self, specifier):
+        return max((self._match_specifier_word(m, specifier)
+                    for m in re.finditer("[a-z]+", self._input)),
+                   key=self.score)
+
+    def _match(self):
+        self.specifier, self.arch_type, self._spans = max(
+            ((specifier, arch_type, self._match_specifier(specifier))
+             for specifier, arch_type in self.SPECIFIERS),
+            key=lambda x: self.score(x[2]),
+        )
+
+    @property
+    def start(self):
+        return self._spans[0].start
+
+    @property
+    def end(self):
+        return self._spans[-1].end
 
     @property
     def before(self):
-        return self.input[:self.best_matches[0].a]
+        return self.input[:self.start]
 
     @property
     def after(self):
-        return self.input[self.best_matches[-1].a + self.best_matches[-1].size:]
+        return self.input[self.end:]
 
     @property
     def matched(self):
-        start = self.best_matches[0].a
-        end = self.best_matches[-1].a + self.best_matches[-1].size
-        return self.input[start:end]
+        return self.input[self.start:self.end]
 
     @staticmethod
-    def score(matches):
-        return sum(match.size**2 for match in matches)
+    def score(spans):
+        return sum(span.size**2 for span in spans)
 
     def show(self):
         bits = []
-        for (specifier, _), matches in zip(self.SPECIFIERS, self.matches):
+        for (specifier, _) in self.SPECIFIERS:
+            spans = self._match_specifier(specifier)
             bits += [
-                highlight_matches(self.input, "a", *matches),
+                highlight_matches(self.input, *spans),
                 "  |  ",
-                highlight_matches(specifier, "b", *matches),
-                " " * (12 - len(specifier)) + "|  ",
-                str(self.score(matches)),
+                specifier.ljust(12, " ") + "|  ",
+                str(self.score(spans)),
                 "\n",
             ]
         return "".join(bits)
@@ -98,15 +118,14 @@ def underscore(x):
     return re.sub("([^\u0332])(\u0332)?", "\\1\u0332", x)
 
 
-def highlight_matches(x, a_or_b, *matches):
+def highlight_matches(x, *spans: Span):
     bits = []
     end = 0
-    for match in matches:
-        start = getattr(match, a_or_b)
+    for span in spans:
         bits += [
-            x[end:start],
-            underscore(x[start:start + match.size]),
+            x[end:span.start],
+            underscore(x[span.start:span.end]),
         ]
-        end = start + match.size
+        end = span.end
     bits.append(x[end:])
     return "".join(bits)
