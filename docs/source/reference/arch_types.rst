@@ -19,7 +19,6 @@ Extracting arch type from strings
     .. autoattribute:: input
     .. autoattribute:: arch_type
     .. autoattribute:: SPECIFIERS
-    .. autoattribute:: matches
     .. automethod:: show
     .. automethod:: score
 

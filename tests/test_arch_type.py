@@ -2,7 +2,16 @@
 """
 """
 
+from textwrap import dedent
+
 from pangolin import ParseArchType, split_arch_type, strip_arch_type, arch_type
+
+
+def test_highlight():
+    from pangolin._arch_type_parser import highlight
+    assert highlight("abc") == "𝗮𝗯𝗰"
+    assert highlight("ABC") == "𝐀𝐁𝐂"
+    assert highlight("123") == "123"
 
 
 def test_basic():
@@ -13,16 +22,16 @@ def test_basic():
     assert self.after == " jaw."
     assert self.arch_type == "U"
 
-    assert self.show() == """\
-I̲ am an Upper jaw.  |  maxillary   |  1
-I am a̲n̲ Upper jaw.  |  mandibular  |  4
-I̲ am an Upper jaw.  |  maxilla     |  1
-I am a̲n̲ Upper jaw.  |  mandible    |  4
-I am an U̲p̲p̲e̲r̲ jaw.  |  upper       |  25
-I am an Uppe̲r̲ jaw.  |  lower       |  4
-I am an Up̲per jaw.  |  top         |  1
-I am̲ an Upper jaw.  |  bottom      |  1
-"""
+    assert self.show() == dedent("""\
+        𝐈 am an Upper jaw.  |  maxillary   |  1
+        I am 𝗮𝗻 Upper jaw.  |  mandibular  |  4
+        𝐈 am an Upper jaw.  |  maxilla     |  1
+        I am 𝗮𝗻 Upper jaw.  |  mandible    |  4
+        I am an 𝐔𝗽𝗽𝗲𝗿 jaw.  |  upper       |  25
+        I am an Upp𝗲𝗿 jaw.  |  lower       |  4
+        I am an U𝗽per jaw.  |  top         |  1
+        I a𝗺 an Upper jaw.  |  bottom      |  1
+    """)
 
     assert split_arch_type(self.input) == ("I am an ", "Upper", " jaw.")
     assert strip_arch_type(self.input) == "I am an jaw."

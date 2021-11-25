@@ -114,8 +114,19 @@ def arch_type(name):
     return ParseArchType(name).arch_type
 
 
-def underscore(x):
-    return re.sub("([^\u0332])(\u0332)?", "\\1\u0332", x)
+def highlight(x):
+    """Replace all ASCII letters in a string with their bold unicode equivalents
+    leaving all other characters unchanged."""
+    return "".join(map(_highlight_character, x))
+
+
+def _highlight_character(x):
+    """Replace an ASCII letter with its bold unicode equivalent."""
+    if ord('a') <= ord(x) <= ord('z'):
+        return chr(ord(x) + 0x1D5EE - 0x61)
+    if ord('A') <= ord(x) <= ord('Z'):
+        return chr(ord(x) + 0x1D400 - 0x41)
+    return x
 
 
 def highlight_matches(x, *spans: Span):
@@ -124,7 +135,7 @@ def highlight_matches(x, *spans: Span):
     for span in spans:
         bits += [
             x[end:span.start],
-            underscore(x[span.start:span.end]),
+            highlight(x[span.start:span.end]),
         ]
         end = span.end
     bits.append(x[end:])
