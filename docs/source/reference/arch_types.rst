@@ -7,7 +7,7 @@ Extracting arch type from strings
 
 .. autofunction:: arch_type
 .. autofunction:: split_arch_type
-.. autofunction:: strip_arch_type
+.. autofunction:: substitute_arch_type
 
 .. autoclass:: ParseArchType
 

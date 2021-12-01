@@ -103,11 +103,54 @@ def split_arch_type(name):
     return self.before, self.matched, self.after
 
 
-def strip_arch_type(name, replace_with="", delimiter=" -_"):
-    before, match, after = split_arch_type(name)
-    if not replace_with:
-        after = after.lstrip(delimiter)
-    return before + replace_with + after
+def substitute_arch_type(text, replace="", *, delimiter=r"[ \-_]"):
+    """Remove or replace the arch type specifier from a string of text.
+
+    Args:
+        text:
+            The text to modify.
+        replace:
+            The text to replace the arch type specifier with. This may be an
+            empty string to strip the arch type specifier or a callable to map
+            it to a value dependent on the original.
+        delimiter:
+            If **replace_with** is (or returns) an empty string and there is
+            a delimiter both before and after the arch type specifier, then
+            additionally strip the delimiter before so as to avoid a double
+            delimiter.
+    Returns:
+        A modified copy of the input text.
+
+    Examples::
+
+        # Strip the arch type specifier.
+        >>> substitute_arch_type("The maxillary jaw")
+        'The jaw'
+
+        # Normalize the arch type specifier.
+        >>> substitute_arch_type(
+        ...     "The maxilliaary jaw",
+        ...     lambda arch_type, _: "upper" if arch_type == "U" else "lower")
+        'The upper jaw'
+
+        # Uppercase the arch type specifier.
+        >>> substitute_arch_type("The maxillary jaw",
+        ...                      lambda _, matched: matched.upper())
+        'The MAXILLARY jaw'
+
+    """
+    parser = ParseArchType(text)
+    after = parser.after
+
+    if callable(replace):
+        replace = replace(parser.arch_type, parser.matched)
+
+    if not replace:
+        m = re.match(delimiter, after)
+        if m:
+            after = after[m.end():]
+
+    return parser.before + replace + after
 
 
 def arch_type(name):

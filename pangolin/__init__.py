@@ -41,5 +41,5 @@ def tooth_kinds(jaw_type=JawType()) -> str:
 
 
 from ._palmer import Palmer
-from ._arch_type_parser import (ParseArchType, split_arch_type, strip_arch_type,
-                                arch_type)
+from ._arch_type_parser import (ParseArchType, split_arch_type,
+                                substitute_arch_type, arch_type)

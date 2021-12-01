@@ -4,7 +4,7 @@
 
 from textwrap import dedent
 
-from pangolin import ParseArchType, split_arch_type, strip_arch_type, arch_type
+from pangolin import ParseArchType, split_arch_type, substitute_arch_type, arch_type
 
 
 def test_highlight():
@@ -34,8 +34,11 @@ def test_basic():
     """)
 
     assert split_arch_type(self.input) == ("I am an ", "Upper", " jaw.")
-    assert strip_arch_type(self.input) == "I am an jaw."
-    assert strip_arch_type(self.input, "lower") == "I am an lower jaw."
+    assert substitute_arch_type(self.input) == "I am an jaw."
+    assert substitute_arch_type(self.input, "lower") == "I am an lower jaw."
+    assert substitute_arch_type(self.input, delimiter="0") == "I am an  jaw."
+    assert substitute_arch_type(self.input, replace=lambda x, y: f"{x} ({y})") \
+        == "I am an U (Upper) jaw."
     assert arch_type(self.input) == "U"
 
 
