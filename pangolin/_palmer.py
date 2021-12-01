@@ -32,10 +32,10 @@ PalmerLike = Union['Palmer', str, Match]
 
 
 class Palmer(JawType):
-    """The `letters and numbers variation` of the Palmer tooth labelling system.
-    See the Palmer column from `here
-    <https://support.clearcorrect.com/hc/article_attachments/360054874894/Dental_Notation_Systems_1_-_EN.jpg>`_\\ .
-    In dentistry, palmers are composed of 3 characters:
+    """A fancy bucket class representing *letters and numbers variation* of the
+    `Palmer tooth labelling system`_.
+
+    Palmers are composed of 3 characters:
 
     #.  **L** or **U** for lower or upper jaw.
     #.  **L** or **R** for left or right half (patient's perspective).
@@ -47,6 +47,9 @@ class Palmer(JawType):
     This bucket class contains the core attributes
     :attr:`arch_type`, :attr:`side`, :attr:`index`, :attr:`sub_index`
     :attr:`primary`, :attr:`species`.
+
+    .. _`Palmer tooth labelling system`:
+        https://support.clearcorrect.com/hc/article_attachments/360054874894/Dental_Notation_Systems_1_-_EN.jpg
 
     """
 

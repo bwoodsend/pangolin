@@ -24,7 +24,10 @@ setup(
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
     ],
-    description="Tools for writing and parsing Dental Palmer notation.",
+    description=
+    "Tools for writing, parsing, manipulating and pretty printing Dental Palmer"
+    "notation and normalising other Dental identifiers into machine-readable "
+    "formats.",
     install_requires=[],
     extras_require={
         "test": [

@@ -7,7 +7,8 @@ Welcome to pangolin!
     :alt: PyPI version
     :target: https://pypi.org/project/pangolin/
 
-Tools for writing and parsing Dental Palmer notation.
+Tools for writing, parsing, manipulating and pretty printing Dental Palmer
+notation and normalising other Dental identifiers into machine-readable formats.
 
 ∘
 `MIT license <https://github.com/bwoodsend/pangolin/blob/master/LICENSE>`_
