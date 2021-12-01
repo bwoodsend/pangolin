@@ -4,7 +4,6 @@
 
 import difflib
 import re
-from typing import List
 from collections import namedtuple
 
 
@@ -16,6 +15,19 @@ class Span(namedtuple("Span", ["start", "size"])):
 
 
 class ParseArchType(object):
+    """A low level arch_type specifier searching engine.
+
+    Examples::
+
+        >>> parse = ParseArchType("patient 123 manddib arch")
+        >>> parse.specifier
+        'mandibular'
+        >>> parse.arch_type
+        'L'
+        >>> parse.before, parse.matched, parse.after
+        ('patient 123 ', 'manddib', ' arch')
+
+    """
 
     # These must be lowercase.
     SPECIFIERS = [
@@ -28,11 +40,15 @@ class ParseArchType(object):
         ("top", "U"),
         ("bottom", "L"),
     ]
+    """A mapping from known keywords to their arch types."""
 
     input: str
+    """The input given on initialisation."""
+
     specifier: str
+    """The normalised keyword """
     arch_type: str
-    best_matches: List[difflib.Match]
+    """Either :py:`'U'` for a maxillary or :py:`'L'` for mandibular."""
 
     def __init__(self, input):
         self.input = str(input)
@@ -41,6 +57,8 @@ class ParseArchType(object):
 
     @staticmethod
     def _match_specifier_word(word_match, specifier):
+        """Compare a single word of input to a single specifier word, generating
+        a sequence of matching spans."""
         matcher = difflib.SequenceMatcher(None, word_match.group(), specifier)
         spans = [
             Span(i.a + word_match.start(), i.size)
@@ -49,42 +67,52 @@ class ParseArchType(object):
         return spans
 
     def _match_specifier(self, specifier):
+        """Compare all of `input` against one specifier word, selecting the best
+        sequence of matching spans."""
         return max((self._match_specifier_word(m, specifier)
                     for m in re.finditer("[a-z]+", self._input)),
-                   key=self.score)
+                   key=self._score)
 
     def _match(self):
+        """Compare all words against all specifiers, selecting the highest
+        overall scoring sequence of matching spans."""
         self.specifier, self.arch_type, self._spans = max(
             ((specifier, arch_type, self._match_specifier(specifier))
              for specifier, arch_type in self.SPECIFIERS),
-            key=lambda x: self.score(x[2]),
+            key=lambda x: self._score(x[2]),
         )
 
     @property
     def start(self):
+        """The starting index of the arch type specifier in the input string."""
         return self._spans[0].start
 
     @property
     def end(self):
+        """The ending index of the arch type specifier in the input string."""
         return self._spans[-1].end
 
     @property
     def before(self):
+        """A slice of the `input` string before the arch type specifier."""
         return self.input[:self.start]
 
     @property
     def after(self):
+        """A slice of the `input` string before the arch type specifier."""
         return self.input[self.end:]
 
     @property
     def matched(self):
+        """The unnormalized substring that identified the arch type."""
         return self.input[self.start:self.end]
 
     @staticmethod
-    def score(spans):
+    def _score(spans):
         return sum(span.size**2 for span in spans)
 
-    def show(self):
+    def _show(self):
+        """Make a table showing each comparison."""
         bits = []
         for (specifier, _) in self.SPECIFIERS:
             spans = self._match_specifier(specifier)
@@ -92,13 +120,15 @@ class ParseArchType(object):
                 highlight_matches(self.input, *spans),
                 "  |  ",
                 specifier.ljust(12, " ") + "|  ",
-                str(self.score(spans)),
+                str(self._score(spans)),
                 "\n",
             ]
         return "".join(bits)
 
 
-def split_arch_type(name):
+def split_arch_type(name: str) -> (str, str, str):
+    """Split a name containing an `arch_type` specifier into the string
+    preceding the specifier, the specifier itself and the rest of the string."""
     self = ParseArchType(name)
     return self.before, self.matched, self.after
 
@@ -153,8 +183,18 @@ def substitute_arch_type(text, replace="", *, delimiter=r"[ \-_]"):
     return parser.before + replace + after
 
 
-def arch_type(name):
-    return ParseArchType(name).arch_type
+def arch_type(text: str) -> str:
+    """Extract and normalise an arch type specifier such as *maxillary* or
+    *lower*.
+
+    Args:
+        text:
+            The text to search.
+    Returns:
+        Either :py:`'U'` or :py:`'L'`.
+
+    """
+    return ParseArchType(text).arch_type
 
 
 def highlight(x):
@@ -173,6 +213,7 @@ def _highlight_character(x):
 
 
 def highlight_matches(x, *spans: Span):
+    """Highlight (with bold) a string in the places specified with spans."""
     bits = []
     end = 0
     for span in spans:

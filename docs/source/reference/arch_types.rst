@@ -11,14 +11,10 @@ Extracting arch type from strings
 
 .. autoclass:: ParseArchType
 
-    .. automethod:: __init__
-    .. autoattribute:: before
-    .. autoattribute:: matched
-    .. autoattribute:: after
-    .. autoattribute:: best_matches
     .. autoattribute:: input
+    .. autoattribute:: before
+    .. autoattribute:: after
+    .. autoattribute:: matched
     .. autoattribute:: arch_type
     .. autoattribute:: SPECIFIERS
-    .. automethod:: show
-    .. automethod:: score
-
+        :annotation:

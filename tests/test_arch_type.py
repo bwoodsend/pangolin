@@ -22,7 +22,7 @@ def test_basic():
     assert self.after == " jaw."
     assert self.arch_type == "U"
 
-    assert self.show() == dedent("""\
+    assert self._show() == dedent("""\
         𝐈 am an Upper jaw.  |  maxillary   |  1
         I am 𝗮𝗻 Upper jaw.  |  mandibular  |  4
         𝐈 am an Upper jaw.  |  maxilla     |  1
