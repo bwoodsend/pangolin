@@ -9,7 +9,7 @@ TOOTH_KINDS = {
     JawType(primary=True): "IICMM",
     JawType(arch_type="U", species="sheep"): "PPPMMM",
     JawType(arch_type="L", species="sheep"): "IIIIPPPMMM",
-    JawType(species="pangolin"): "",
+    JawType(species="pangolin", primary="*"): "",
 }
 
 
