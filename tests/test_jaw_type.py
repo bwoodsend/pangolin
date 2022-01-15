@@ -2,7 +2,6 @@
 """
 """
 
-import attr
 import pytest
 
 from pangolin import JawType
