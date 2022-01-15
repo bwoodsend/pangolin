@@ -3,7 +3,6 @@
 """
 
 from setuptools import setup, find_packages
-import runpy
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -43,6 +42,6 @@ setup(
     name='pangolin',
     packages=find_packages(include=['pangolin', 'pangolin.*']),
     url='https://github.com/bwoodsend/pangolin',
-    version=runpy.run_path(HERE / "pangolin/_version.py")["__version__"],
+    version="0.1.0",
     zip_safe=False,
 )
