@@ -38,7 +38,7 @@ class BaseBucket(Mapping):
 
         Args:
              skip_wildcard:
-                Wildcard attributes are excluded if true.
+                 Wildcard attributes are excluded if true.
 
         Without **skip_wildcard**, this can also be achieved by passing this
         object directly to :class:`dict`.
@@ -145,8 +145,8 @@ class JawType(BaseBucket):
     @property
     def species(self) -> str:
         """Specifies the species. Defaults to, and will likely always be,
-        :py:`'human'`. It is highly recommended that you use '-' instead of spaces
-        to delimite multiple words.
+        :py:`'human'`. It is highly recommended that you use '-' instead of
+        spaces to delimit multiple words.
         """
         return self._species
 
