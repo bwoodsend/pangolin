@@ -23,14 +23,14 @@ def test_basic():
     assert self.arch_type == "U"
 
     assert self._show() == dedent("""\
-        𝐈 am an Upper jaw.  |  maxillary   |  1
-        I am 𝗮𝗻 Upper jaw.  |  mandibular  |  4
-        𝐈 am an Upper jaw.  |  maxilla     |  1
-        I am 𝗮𝗻 Upper jaw.  |  mandible    |  4
-        I am an 𝐔𝗽𝗽𝗲𝗿 jaw.  |  upper       |  25
-        I am an Upp𝗲𝗿 jaw.  |  lower       |  4
-        I am an U𝗽per jaw.  |  top         |  1
-        I a𝗺 an Upper jaw.  |  bottom      |  1
+        I 𝗮m an Upper jaw.  |  maxillary   |  1 -1
+        I am 𝗮𝗻 Upper jaw.  |  mandibular  |  4 -1
+        I 𝗮m an Upper jaw.  |  maxilla     |  1 -1
+        I am 𝗮𝗻 Upper jaw.  |  mandible    |  4 -1
+        I am an 𝐔𝗽𝗽𝗲𝗿 jaw.  |  upper       |  25 0
+        I am an Upp𝗲𝗿 jaw.  |  lower       |  4 -3
+        I am an U𝗽per jaw.  |  top         |  1 -2
+        I a𝗺 an Upper jaw.  |  bottom      |  1 -5
     """)
 
     assert split_arch_type(self.input) == ("I am an ", "Upper", " jaw.")
@@ -60,3 +60,12 @@ def test_fuzzy():
     assert arch_type("manible") == "L"
     assert arch_type("Max's manible jaw.") == "L"
     assert arch_type("Maxime's mangible is spelt wrong.") == "L"
+
+
+def test_tie_break():
+    """Test the preference for matching the beginning of a keyword in the case
+    of a tie W.R.T match lengths."""
+    assert arch_type("I.L.D") == "L"
+    assert arch_type("IB.AX.WE.AR") == "U"
+    assert arch_type("L") == "L"
+    assert arch_type("U") == "U"

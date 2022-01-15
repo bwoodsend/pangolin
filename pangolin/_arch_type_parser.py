@@ -7,7 +7,7 @@ import re
 from collections import namedtuple
 
 
-class Span(namedtuple("Span", ["start", "size"])):
+class Span(namedtuple("Span", ["start", "size", "start_b"])):
 
     @property
     def end(self):
@@ -61,7 +61,7 @@ class ParseArchType(object):
         a sequence of matching spans."""
         matcher = difflib.SequenceMatcher(None, word_match.group(), specifier)
         spans = [
-            Span(i.a + word_match.start(), i.size)
+            Span(i.a + word_match.start(), i.size, i.b)
             for i in matcher.get_matching_blocks()
         ]
         return spans
@@ -109,7 +109,11 @@ class ParseArchType(object):
 
     @staticmethod
     def _score(spans):
-        return sum(span.size**2 for span in spans)
+        # Score based on the number of characters matching, preferring few long
+        # streaks of matching characters over lots of short streaks. In the case
+        # of a tie, prefer matches that start closest to the beginning of the
+        # target specifier keyword.
+        return sum(span.size**2 for span in spans), -spans[0].start_b
 
     def _show(self):
         """Make a table showing each comparison."""
@@ -120,7 +124,7 @@ class ParseArchType(object):
                 highlight_matches(self.input, *spans),
                 "  |  ",
                 specifier.ljust(12, " ") + "|  ",
-                str(self._score(spans)),
+                " ".join(map(str, self._score(spans))),
                 "\n",
             ]
         return "".join(bits)
