@@ -65,7 +65,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'pangolin'
-copyright = "2021, Brénainn Woodsend"
+copyright = "2021-2024, Brénainn Woodsend"
 author = "Brénainn Woodsend"
 
 # The version info for the project you're documenting, acts as replacement
