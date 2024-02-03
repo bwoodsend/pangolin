@@ -5,8 +5,6 @@
 import pytest
 from pangolin import Palmer, JawType
 
-pytestmark = pytest.mark.order(3)
-
 
 def test_init():
     """Assert that __init__ arguments are in the right order and work."""

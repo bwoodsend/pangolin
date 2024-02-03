@@ -6,8 +6,6 @@ import pytest
 
 from pangolin import JawType
 
-pytestmark = pytest.mark.order(1)
-
 
 def test_basics():
     self = JawType()

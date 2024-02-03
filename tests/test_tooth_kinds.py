@@ -6,8 +6,6 @@ import pytest
 
 from pangolin import tooth_kinds, TOOTH_KINDS, JawType
 
-pytestmark = pytest.mark.order(2)
-
 
 def test():
     """Test :func:`pangolin.tooth_kinds`."""

@@ -5,8 +5,6 @@
 import pytest
 from pangolin import Palmer
 
-pytestmark = pytest.mark.order(4)
-
 
 @pytest.mark.parametrize("primary", [False, True])
 def test_universal(primary):
