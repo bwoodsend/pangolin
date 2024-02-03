@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-"""
-
 import pytest
 
 from pangolin import tooth_kinds, TOOTH_KINDS, JawType

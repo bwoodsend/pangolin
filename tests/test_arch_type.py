@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-"""
-
 from textwrap import dedent
 
 from pangolin import ParseArchType, split_arch_type, substitute_arch_type, arch_type

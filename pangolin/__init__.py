@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-"""
 from ._jaw_type import JawType
 
 TOOTH_KINDS = {
