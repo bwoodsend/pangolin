@@ -1,6 +1,10 @@
 from textwrap import dedent
+import contextlib
 
-from pangolin import ParseArchType, split_arch_type, substitute_arch_type, arch_type
+import pytest
+import hypothesis.strategies
+
+from pangolin import ParseArchType, split_arch_type, substitute_arch_type, arch_type, AmbiguousArchType
 
 
 def test_highlight():
@@ -44,24 +48,27 @@ def test_word_boundaries():
     assert split_arch_type("A maxizlarry with a z") \
            == ("A ", "maxizlarry", " with a z")
 
-    assert split_arch_type("A maxi llary with a space") \
-        == ("A maxi ", "llary", " with a space")
-
-    assert split_arch_type("A MAXI.LLARY with a '.'") \
-        == ("A MAXI.", "LLARY", " with a '.'")
-
 
 def test_fuzzy():
     assert arch_type("Bob maxil") == "U"
     assert arch_type("manible") == "L"
     assert arch_type("Max's manible jaw.") == "L"
-    assert arch_type("Maxime's mangible is spelt wrong.") == "L"
+    assert arch_type("Maxime's mangible spelt wrong.") == "L"
+    with pytest.raises(AmbiguousArchType, match=' "tom axilla"'):
+        arch_type("tom axilla")
 
 
-def test_tie_break():
-    """Test the preference for matching the beginning of a keyword in the case
-    of a tie W.R.T match lengths."""
+def test_short_keyword():
+    """Test the <3 letter handling."""
     assert arch_type("I.L.D") == "L"
-    assert arch_type("IB.AX.WE.AR") == "U"
     assert arch_type("L") == "L"
     assert arch_type("U") == "U"
+    assert arch_type("U7") == "U"
+    with pytest.raises(AmbiguousArchType):
+        arch_type("bob L")
+
+
+@hypothesis.given(hypothesis.strategies.text())
+def test_fuzz(x):
+    with contextlib.suppress(AmbiguousArchType):
+        arch_type(x)

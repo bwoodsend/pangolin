@@ -65,18 +65,32 @@ class ParseArchType(object):
     def _match_specifier(self, specifier):
         """Compare all of `input` against one specifier word, selecting the best
         sequence of matching spans."""
-        return max((self._match_specifier_word(m, specifier)
-                    for m in re.finditer("[a-z]+", self._input)),
-                   key=self._score)
+        return self._max((self._match_specifier_word(m, specifier)
+                          for m in re.finditer("[a-z]+", self._input)),
+                         key=self._score)
 
     def _match(self):
         """Compare all words against all specifiers, selecting the highest
         overall scoring sequence of matching spans."""
-        self.specifier, self.arch_type, self._spans = max(
+        specifier, arch_type, spans = self._max(
             ((specifier, arch_type, self._match_specifier(specifier))
              for specifier, arch_type in self.SPECIFIERS),
             key=lambda x: self._score(x[2]),
         )
+
+        score = self._score(spans)[0]
+        if score < 3 ** 2:
+            if score < max(len(i) for i in re.findall("[a-z]+", self._input)) ** 2:
+                raise AmbiguousArchType(self.input)
+        if specifier[0] != self._input[spans[0].start]:
+            raise AmbiguousArchType(self.input)
+        self.specifier, self.arch_type, self._spans = specifier, arch_type, spans
+
+    def _max(self, iterable, key):
+        candidates = list(iterable)
+        if not candidates:
+            raise AmbiguousArchType(self.input)
+        return max(candidates, key=key)
 
     @property
     def start(self):
@@ -124,6 +138,11 @@ class ParseArchType(object):
                 "\n",
             ]
         return "".join(bits)
+
+
+class AmbiguousArchType(Exception):
+    def __str__(self):
+        return f'Unable to determine arch type from the name "{self.args[0]}"'
 
 
 def split_arch_type(name: str) -> (str, str, str):
