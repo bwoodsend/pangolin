@@ -1,8 +1,7 @@
----
 name: Test
 
 on:
-  push:
+  workflow_dispatch:
 
 jobs:
   test:
@@ -10,13 +9,11 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            python-version: 3.12
-          - os: ubuntu-20.04
-            python-version: 3.6
+            python-version: 3.14-dev
           - os: macos-latest
             python-version: 3.12
           - os: windows-latest
-            python-version: 3.9
+            python-version: 3.6
       fail-fast: false
     runs-on: ${{ matrix.os }}
 
