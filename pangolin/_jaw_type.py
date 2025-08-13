@@ -82,13 +82,13 @@ class BaseBucket(Mapping):
     def __len__(self):
         return len(self.__slots__)
 
-    def __array__(self):  # pragma: needs-numpy
+    def __array__(self, dtype=None, copy=None):  # pragma: needs-numpy
         # Doing this prevents numpy.array(JawType()) from becoming:
         #   array(['arch_type', 'primary', 'species'], dtype='<U9')
         # Avoid using `import numpy` to prevent PyInstaller thinking pangolin
         # depends on NumPy.
         out = sys.modules["numpy"].empty((), object)
-        out.itemset(self)
+        out[()] = self
         return out
 
     @classmethod
